@@ -358,7 +358,6 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
               })
             : [...entries]
 
-    console.log('rendering with ', filteredEntries.length, ' filtered entries')
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
@@ -402,7 +401,7 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={entry.name}
+                                            key={entry.id}
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">

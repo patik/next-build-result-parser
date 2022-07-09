@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 const round = (num: number): number =>
     Math.round((num + Number.EPSILON) * 10) / 10
 
@@ -82,6 +84,7 @@ export async function toEntry(file: File, callback: (entry: Entry) => void) {
         })
 
         callback({
+            id: uuidv4(),
             name: file.name.replace(/\.txt$/, ''),
             duration: parseFloat(
                 (/^Done\sin\s([\w.]+)s.$/m.exec(text) ?? ['0', '0'])[1],

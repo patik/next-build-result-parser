@@ -11,6 +11,7 @@ type Page = {
 }
 
 interface Entry {
+    id: string
     name: string
     duration: number
     pages: Page

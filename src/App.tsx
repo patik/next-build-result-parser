@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { FileUploader } from 'react-drag-drop-files'
 import './styles.css'
-import EnhancedTable from './EnhancedTable'
 import { toEntry } from './utils'
+import DataTable from './DataTable'
 
 export default function App() {
     const [entries, setEntries] = useState<Entry[]>([])
@@ -31,7 +31,7 @@ export default function App() {
             </div>
             {entries.length > 0 ? (
                 <div>
-                    <EnhancedTable entries={entries} />
+                    <DataTable rows={entries} />
                 </div>
             ) : null}
         </div>
