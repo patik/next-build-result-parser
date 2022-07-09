@@ -46,60 +46,71 @@ function getTotal(fileResults: FileResult[]) {
     return round(arraySum(fileResults.map(getFileSizeInKilobytes)))
 }
 
-export async function toEntry(file: File, callback: (entry: Entry) => void) {
-    await file.text().then((text) => {
-        const pages: FileResult[] = []
-        const sharedJs: FileResult[] = []
-        let firstLoadJs = ''
+export function toEntry(
+    text: string,
+    name: string,
+    callback: (entry: Entry) => void,
+) {
+    const pages: FileResult[] = []
+    const sharedJs: FileResult[] = []
+    let firstLoadJs = ''
 
-        text.split('\n').forEach((line) => {
-            // Page
-            if (
-                line.startsWith('└') ||
-                line.startsWith('├') ||
-                line.startsWith('└')
-            ) {
-                const pieces = pageRegex.exec(line)
+    text.split('\n').forEach((line) => {
+        // Page
+        if (
+            line.startsWith('└') ||
+            line.startsWith('├') ||
+            line.startsWith('└')
+        ) {
+            const pieces = pageRegex.exec(line)
 
-                if (pieces?.groups) {
-                    pages.push({
-                        name: pieces.groups.name,
-                        size: pieces.groups.size,
-                        time: pieces.groups.time,
-                    })
-                }
-            } else if (line.startsWith('+ First Load JS shared by all')) {
-                firstLoadJs = firstLoadJsRegex.exec(line)?.groups?.size ?? ''
-            } else if (jsChunkRegex.test(line)) {
-                const pieces = jsChunkRegex.exec(line)
-
-                if (pieces?.groups) {
-                    sharedJs.push({
-                        name: pieces.groups.name,
-                        size: pieces.groups.size,
-                        time: pieces.groups.time,
-                    })
-                }
+            if (pieces?.groups) {
+                pages.push({
+                    name: pieces.groups.name,
+                    size: pieces.groups.size,
+                    time: pieces.groups.time,
+                })
             }
-        })
+        } else if (line.startsWith('+ First Load JS shared by all')) {
+            firstLoadJs = firstLoadJsRegex.exec(line)?.groups?.size ?? ''
+        } else if (jsChunkRegex.test(line)) {
+            const pieces = jsChunkRegex.exec(line)
 
-        callback({
-            id: uuidv4(),
-            name: file.name.replace(/\.txt$/, ''),
-            duration: parseFloat(
-                (/^Done\sin\s([\w.]+)s.$/m.exec(text) ?? ['0', '0'])[1],
-            ),
-            pages: {
-                total: getTotal(pages),
-                average: round(getTotal(pages) / pages.length),
-                files: pages,
-            },
-            sharedJs: {
-                total: getTotal(sharedJs),
-                average: round(getTotal(sharedJs) / sharedJs.length),
-                files: sharedJs,
-            },
-            firstLoadJs,
-        })
+            if (pieces?.groups) {
+                sharedJs.push({
+                    name: pieces.groups.name,
+                    size: pieces.groups.size,
+                    time: pieces.groups.time,
+                })
+            }
+        }
+    })
+
+    callback({
+        id: uuidv4(),
+        name,
+        duration: parseFloat(
+            (/^Done\sin\s([\w.]+)s.$/m.exec(text) ?? ['0', '0'])[1],
+        ),
+        pages: {
+            total: getTotal(pages),
+            average: round(getTotal(pages) / pages.length),
+            files: pages,
+        },
+        sharedJs: {
+            total: getTotal(sharedJs),
+            average: round(getTotal(sharedJs) / sharedJs.length),
+            files: sharedJs,
+        },
+        firstLoadJs,
+    })
+}
+
+export async function getEntryFromFile(
+    file: File,
+    callback: (entry: Entry) => void,
+) {
+    await file.text().then((text) => {
+        toEntry(text, file.name.replace(/\.txt$/, ''), callback)
     })
 }
