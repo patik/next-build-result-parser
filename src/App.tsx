@@ -4,13 +4,16 @@ import './styles.css'
 import { toEntry, getEntryFromFile } from './utils'
 import DataTable from './DataTable'
 import EnhancedTable from './EnhancedTable'
+import Overview from './Overview'
 
 export default function App() {
     const [entries, setEntries] = useState<Entry[]>([])
     const addEntry = (entry: Entry) => {
         setEntries((oldList) => {
             // Check for duplicates based on the filename
-            if (oldList.find((e) => e.name === entry.name)) {
+            if (
+                oldList.find((e) => e.name === entry.name || e.id === entry.id)
+            ) {
                 return oldList
             }
 
@@ -61,11 +64,12 @@ export default function App() {
             </div>
             {entries.length > 0 ? (
                 <>
-                    <div>
-                        <DataTable rows={entries} />
-                    </div>
+                    <Overview entries={entries} />
                     <div>
                         <EnhancedTable entries={entries} />
+                    </div>
+                    <div>
+                        <DataTable rows={entries} />
                     </div>
                 </>
             ) : null}

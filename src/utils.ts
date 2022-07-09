@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-const round = (num: number): number =>
+export const round = (num: number): number =>
     Math.round((num + Number.EPSILON) * 10) / 10
 
 // https://regex101.com/r/EYz6Hh/1
@@ -15,7 +15,8 @@ const jsChunkRegex = /\s+[├└]\s+(?<name>\S+)\s+(\((?<time>\d+\s+ms)\)\s+)?(?
 // https://regex101.com/r/dX9oww/1
 const sizePattern = /(?<value>\d+(?:\.\d+)?)\s+(?<unit>\w+)/
 
-const arraySum = (arr: number[]): number => arr.reduce((a, b) => a + b, 0)
+export const arraySum = (arr: number[]): number =>
+    arr.reduce((a, b) => a + b, 0)
 
 function getFileSizeInKilobytes(fileResult: FileResult): number {
     const size = fileResult.size
