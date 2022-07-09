@@ -5,3 +5,9 @@
 .App > div {
     margin: 1em;
 }
+
+.file-drop-target {
+    width: 100%;
+    min-width: 100%;
+    margin-bottom: 3em;
+}

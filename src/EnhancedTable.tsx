@@ -20,6 +20,7 @@ import Switch from '@mui/material/Switch'
 import DeleteIcon from '@mui/icons-material/Delete'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { visuallyHidden } from '@mui/utils'
+import { TextField } from '@mui/material'
 
 function isPage(foo: Entry[keyof Entry]): foo is Page {
     if (typeof foo === 'string' || typeof foo === 'number') {
@@ -91,7 +92,7 @@ const headCells: readonly HeadCell[] = [
         id: 'name',
         numeric: false,
         disablePadding: true,
-        label: 'Run',
+        label: 'Run description',
     },
     {
         id: 'duration',
@@ -162,7 +163,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
                         }}
                     />
                 </TableCell>
-
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
@@ -193,59 +193,89 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
     numSelected: number
+    setFilter: (s: string) => void
 }
 
-const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
-    const { numSelected } = props
+const EnhancedTableToolbar = ({
+    numSelected,
+    setFilter,
+}: EnhancedTableToolbarProps) => {
+    const [showFilter, setShowFilter] = React.useState(false)
 
     return (
-        <Toolbar
-            sx={{
-                pl: { sm: 2 },
-                pr: { xs: 1, sm: 1 },
-                ...(numSelected > 0 && {
-                    bgcolor: (theme) =>
-                        alpha(
-                            theme.palette.primary.main,
-                            theme.palette.action.activatedOpacity,
-                        ),
-                }),
-            }}
-        >
-            {numSelected > 0 ? (
-                <>
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        color="inherit"
-                        variant="subtitle1"
-                        component="div"
-                    >
-                        {numSelected} selected
-                    </Typography>
-                    <Tooltip title="Delete">
-                        <IconButton>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            ) : (
-                <>
-                    <Typography
-                        sx={{ flex: '1 1 100%' }}
-                        variant="h6"
-                        id="tableTitle"
-                        component="div"
-                    >
-                        Results
-                    </Typography>
-                    <Tooltip title="Filter list">
-                        <IconButton>
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
-                </>
-            )}
-        </Toolbar>
+        <>
+            <Toolbar
+                sx={{
+                    pl: { sm: 2 },
+                    pr: { xs: 1, sm: 1 },
+                    ...(numSelected > 0 && {
+                        bgcolor: (theme) =>
+                            alpha(
+                                theme.palette.primary.main,
+                                theme.palette.action.activatedOpacity,
+                            ),
+                    }),
+                }}
+            >
+                {numSelected > 0 ? (
+                    <>
+                        <Typography
+                            sx={{ flex: '1 1 100%' }}
+                            color="inherit"
+                            variant="subtitle1"
+                            component="div"
+                        >
+                            {numSelected} selected
+                        </Typography>
+                        <Tooltip title="Delete">
+                            <IconButton>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                ) : (
+                    <>
+                        <Typography
+                            sx={{ flex: '1 1 100%' }}
+                            variant="h6"
+                            id="tableTitle"
+                            component="div"
+                        >
+                            Results
+                        </Typography>
+                        <Tooltip title="Filter list">
+                            <IconButton
+                                onClick={() => setShowFilter(!showFilter)}
+                                color={showFilter ? 'primary' : 'default'}
+                            >
+                                <FilterListIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                )}
+            </Toolbar>
+            {showFilter ? (
+                <Toolbar
+                    sx={{
+                        pl: { sm: 2 },
+                        pr: { xs: 1, sm: 1 },
+                        ...(numSelected > 0 && {
+                            bgcolor: (theme) =>
+                                alpha(
+                                    theme.palette.primary.main,
+                                    theme.palette.action.activatedOpacity,
+                                ),
+                        }),
+                    }}
+                >
+                    <TextField
+                        label="Filter by run name"
+                        variant="standard"
+                        onChange={(evt) => setFilter(evt.target.value)}
+                    />
+                </Toolbar>
+            ) : null}
+        </>
     )
 }
 
@@ -256,6 +286,7 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
     const [page, setPage] = React.useState(0)
     const [dense, setDense] = React.useState(false)
     const [rowsPerPage, setRowsPerPage] = React.useState(25)
+    const [filter, setFilter] = React.useState('')
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -318,10 +349,23 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - entries.length) : 0
 
+    const filteredEntries: Entry[] =
+        filter.length > 0
+            ? [...entries].filter((entry) => {
+                  return entry.name
+                      .toLowerCase()
+                      .includes(filter.trim().toLowerCase())
+              })
+            : [...entries]
+
+    console.log('rendering with ', filteredEntries.length, ' filtered entries')
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar
+                    numSelected={selected.length}
+                    setFilter={setFilter}
+                />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -334,11 +378,10 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={entries.length}
+                            rowCount={filteredEntries.length}
                         />
                         <TableBody>
-                            {entries
-                                .slice()
+                            {filteredEntries
                                 .sort(getComparator(order, orderBy))
                                 .slice(
                                     page * rowsPerPage,
@@ -379,8 +422,20 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
                                             >
                                                 {entry.name}
                                             </TableCell>
-                                            <TableCell>{`${entry.duration}s`}</TableCell>
-                                            <TableCell>{`${entry.firstLoadJs}`}</TableCell>
+                                            <TableCell
+                                                align="right"
+                                                sx={{
+                                                    fontFamily:
+                                                        'Menlo, Consolas, monospace',
+                                                }}
+                                            >{`${entry.duration} s`}</TableCell>
+                                            <TableCell
+                                                align="right"
+                                                sx={{
+                                                    fontFamily:
+                                                        'Menlo, Consolas, monospace',
+                                                }}
+                                            >{`${entry.firstLoadJs}`}</TableCell>
                                             <TableCell>
                                                 {`${entry.pages.files.length} pages`}
                                                 <br />
@@ -409,7 +464,7 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={entries.length}
+                    count={filteredEntries.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
