@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 
 export const round = (num: number): number =>
-    Math.round((num + Number.EPSILON) * 10) / 10
+    Math.round((num + Number.EPSILON) * 100) / 100
 
 // https://regex101.com/r/EYz6Hh/1
 const pageRegex = /\s+(?<name>(?:└\s+)?\/?\S*)\s+(\((?<time>\d+\s+ms)\)\s+)?(?<size>\d+(?:\.\d+)?\s+\w+)(?:\s+(?<firstjs>\d+(?:\.\d+)?\s+\w+))?/

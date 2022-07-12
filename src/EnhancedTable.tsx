@@ -237,7 +237,7 @@ const EnhancedTableToolbar = ({
                     <>
                         <Typography
                             sx={{ flex: '1 1 100%' }}
-                            variant="h6"
+                            variant="h3"
                             id="tableTitle"
                             component="div"
                         >
@@ -284,7 +284,7 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
     const [orderBy, setOrderBy] = React.useState<keyof Entry>('duration')
     const [selected, setSelected] = React.useState<readonly string[]>([])
     const [page, setPage] = React.useState(0)
-    const [dense, setDense] = React.useState(false)
+    const [dense, setDense] = React.useState(true)
     const [rowsPerPage, setRowsPerPage] = React.useState(25)
     const [filter, setFilter] = React.useState('')
 
@@ -360,7 +360,7 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
 
     return (
         <Box sx={{ width: '100%' }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
+            <Box sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar
                     numSelected={selected.length}
                     setFilter={setFilter}
@@ -469,7 +469,7 @@ export default function EnhancedTable({ entries }: { entries: Entry[] }) {
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            </Paper>
+            </Box>
             <FormControlLabel
                 control={
                     <Switch checked={dense} onChange={handleChangeDense} />

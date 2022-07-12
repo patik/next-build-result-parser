@@ -1,11 +1,24 @@
 import { Box, Typography } from '@mui/material'
-import { arraySum, round } from './utils'
+import { arraySum } from './utils'
 
 export default function Overview({ entries }: { entries: Entry[] }) {
     return (
-        <Box px={2}>
+        <Box>
+            <Typography variant="h2">
+                Overall average time for production builds
+            </Typography>
+            <Box py={1}>
+                <Typography variant="body2">
+                    Cold build:{' '}
+                    <code>git clean -fdx && yarn install && yarn build</code>
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                    Warm build: <code>yarn build</code> after a cold build has
+                    completed
+                </Typography>
+            </Box>
             <Typography>
-                {`Babel cold, average duration: ${round(
+                {`Babel, cold: ${Math.round(
                     arraySum(
                         entries
                             .filter((e) => e.name.includes('babel cold'))
@@ -16,7 +29,7 @@ export default function Overview({ entries }: { entries: Entry[] }) {
                 )} s`}
             </Typography>
             <Typography>
-                {`SWC cold, average duration: ${round(
+                {`SWC, cold: ${Math.round(
                     arraySum(
                         entries
                             .filter((e) => e.name.includes('swc cold'))
@@ -27,7 +40,7 @@ export default function Overview({ entries }: { entries: Entry[] }) {
                 )} s`}
             </Typography>
             <Typography variant="body1">
-                {`Babel warm, average duration: ${round(
+                {`Babel, warm: ${Math.round(
                     arraySum(
                         entries
                             .filter((e) => e.name.includes('babel warm'))
@@ -38,7 +51,7 @@ export default function Overview({ entries }: { entries: Entry[] }) {
                 )} s`}
             </Typography>
             <Typography>
-                {`SWC warm, average duration: ${round(
+                {`SWC, warm: ${Math.round(
                     arraySum(
                         entries
                             .filter((e) => e.name.includes('swc warm'))

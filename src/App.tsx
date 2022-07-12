@@ -2,9 +2,26 @@ import { useEffect, useState } from 'react'
 import { FileUploader } from 'react-drag-drop-files'
 import './styles.css'
 import { toEntry, getEntryFromFile } from './utils'
-import DataTable from './DataTable'
+// import DataTable from './DataTable'
 import EnhancedTable from './EnhancedTable'
 import Overview from './Overview'
+import { Box } from '@mui/material'
+import { Typography } from '@mui/material'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+
+const theme = createTheme({
+    typography: {
+        h1: {
+            fontSize: 36,
+        },
+        h2: {
+            fontSize: 26,
+        },
+        h3: {
+            fontSize: 24,
+        },
+    },
+})
 
 export default function App() {
     const [entries, setEntries] = useState<Entry[]>([])
@@ -52,27 +69,30 @@ export default function App() {
     }, [])
 
     return (
-        <div className="App">
-            <div>
-                <FileUploader
-                    handleChange={handleChange}
-                    name="file"
-                    types={['TXT']}
-                    multiple
-                    classes="file-drop-target"
-                />
-            </div>
-            {entries.length > 0 ? (
-                <>
-                    <Overview entries={entries} />
-                    <div>
+        <ThemeProvider theme={theme}>
+            <Box p={1}>
+                <Typography variant="h1">Next.js Build Analyzer</Typography>
+                <Box py={2}>
+                    <FileUploader
+                        handleChange={handleChange}
+                        name="file"
+                        types={['TXT']}
+                        multiple
+                        classes="file-drop-target"
+                    />
+                </Box>
+                {entries.length > 0 ? (
+                    <>
+                        <Overview entries={entries} />
+
                         <EnhancedTable entries={entries} />
-                    </div>
-                    <div>
-                        <DataTable rows={entries} />
-                    </div>
-                </>
-            ) : null}
-        </div>
+
+                        {/* >
+                            <DataTable rows={entries} />
+                        </div */}
+                    </>
+                ) : null}
+            </Box>
+        </ThemeProvider>
     )
 }
